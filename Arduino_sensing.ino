@@ -119,7 +119,6 @@ int sizeOfArray = N;
 int nothing, touch, touch2, grab;
 
 float results[N];            //-Filtered result buffer
-float freq[N];            //-Filtered result buffer
 
 
 void setup()
@@ -145,29 +144,30 @@ void setup()
 
 void loop()
 {
-  int v = readValeur();
+  int v = (readValeur()+readValeur()+readValeur()+readValeur())/4;
   
-  //Serial.println(v);
-  if (v < (nothing+touch/2))  { //nothing
-    Serial.println("Nothing");
-  } else if( v < (touch+touch2/2))  { //touch
+  Serial.println(v);
+  
+  if (v < (int(nothing+0.15*nothing)))  { //nothing
+    
+    digitalWrite(10,LOW);
+    digitalWrite(11,LOW);
+    
+  } else if( v < int((touch+0.15*touch)))  { //touch
     
     digitalWrite(10,HIGH);
     digitalWrite(11,LOW);
-    Serial.println("Touch");
     
-  } else if (v < (touch2+grab/2)) { //touch2
+  } else if (v < (touch2+0.15*touch2)) { //touch2
     
     digitalWrite(10,LOW);
     digitalWrite(11,HIGH);
-    Serial.println("Touch2");
     
   } else  { //grab
 
     pinMode(8,OUTPUT);
     digitalWrite(10,LOW);
     digitalWrite(11,LOW);
-    
     music();
     pinMode(8,INPUT);
   }
@@ -180,7 +180,7 @@ int readValeur ()  {
   int counter = 0;
   float Vmax = 0;
   int Imax = 0;
-  
+    
   for(unsigned int d=0;d<N;d++)
   {
     int v=analogRead(0);    //-Read response signal
@@ -194,9 +194,7 @@ int readValeur ()  {
     if (results[d] > Vmax) {
       Vmax = results[d];
       Imax = d;
-      }
-    freq[d] = d;
- 
+      } 
   }
 
   TOG(PORTB,0);            //-Toggle pin 8 after each sweep (good for scope)
